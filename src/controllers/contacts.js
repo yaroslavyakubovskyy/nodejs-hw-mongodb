@@ -6,8 +6,15 @@ import {
   updateContactById,
   deleteContactById,
 } from '../services/contacts.js';
+
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { parseSortParams } from '../utils/parseSortParams.js';
+import { contactSortFields } from '../db/models/Contact.js';
+
 export const getContactsController = async (req, res) => {
-  const data = await getContacts();
+  const { page, perPage } = parsePaginationParams(req.query);
+  const { sortBy, sortOrder } = parseSortParams(req.query, contactSortFields);
+  const data = await getContacts({ page, perPage, sortBy, sortOrder });
 
   res.json({
     status: 200,
@@ -31,7 +38,6 @@ export const getContactByIdController = async (req, res) => {
 
 export const addContactController = async (req, res) => {
   const data = await addContact(req.body);
-
   res
     .status(201)
     .json({ status: 201, message: 'Successfully created a contact!', data });
