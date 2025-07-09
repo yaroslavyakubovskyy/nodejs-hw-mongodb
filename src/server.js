@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 // import pino from 'pino-http';
 import contactsRouter from './routers/contacts.js';
@@ -12,6 +13,7 @@ export const startServer = () => {
 
   app.use(cors());
   app.use(express.json());
+  app.use(cookieParser());
   // app.use(
   //   pino({
   //     transport: {

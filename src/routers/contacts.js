@@ -17,26 +17,36 @@ import {
   contactUpdateSchema,
 } from '../validation/contactSchemas.js';
 import { isValidID } from '../middlewares/isValidId.js';
+import { authenticate } from '../middlewares/authenticate.js';
+
 const contactsRouter = Router();
+
+contactsRouter.use(authenticate);
+
 contactsRouter.get('/', ctrlWrapper(getContactsController));
+
 contactsRouter.get('/:id', isValidID, ctrlWrapper(getContactByIdController));
+
 contactsRouter.post(
   '/',
   validateBody(contactAddSchema),
   ctrlWrapper(addContactController),
 );
+
 contactsRouter.put(
   '/:id',
   isValidID,
   validateBody(contactUpdateSchema),
   ctrlWrapper(upsertContactByIdController),
 );
+
 contactsRouter.patch(
   '/:id',
   isValidID,
   validateBody(contactUpdateSchema),
   ctrlWrapper(patchContactByIdController),
 );
+
 contactsRouter.delete(
   '/:id',
   isValidID,

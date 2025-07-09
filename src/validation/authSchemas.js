@@ -2,7 +2,7 @@ import Joi from 'joi';
 import { emailRegexp } from '../constants/auth-constans.js';
 
 export const registerSchema = Joi.object({
-  username: Joi.string().required().messages({
+  name: Joi.string().required().messages({
     'string.empty': 'Username is required',
     'any.required': 'Username is required',
   }),

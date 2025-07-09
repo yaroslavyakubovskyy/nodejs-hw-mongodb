@@ -8,6 +8,17 @@ import {
   refreshTokenLifetime,
 } from '../constants/auth-constans.js';
 
+const createSession = () => ({
+  accessToken: randomBytes(30).toString('base64'),
+  refreshToken: randomBytes(30).toString('base64'),
+  accessTokenValidUntil: Date.now() + accessTokenLifetime,
+  refreshTOkenValidUntil: Date.now() + refreshTokenLifetime,
+});
+
+export const findSession = (query) => SessionCollection.findOne(query);
+
+export const findUser = (query) => UserCollection.findOne(query);
+
 export const registerUser = async (payload) => {
   const { email, password } = payload;
 
@@ -31,14 +42,28 @@ export const loginUser = async ({ email, password }) => {
   const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) throw createHttpError(401, 'Email or password invalid');
 
-  const accessToken = randomBytes(30).toString('base64');
-  const refreshToken = randomBytes(30).toString('base64');
+  const session = createSession();
 
   return SessionCollection.create({
     userId: user._id,
-    accessToken,
-    refreshToken,
-    accessTokenValidUntil: new Date() + accessTokenLifetime,
-    refreshTOkenValidUntil: new Date() + refreshTokenLifetime,
+    ...session,
   });
 };
+
+export const refreshUser = async ({ refreshToken, sessionId }) => {
+  const oldSession = await findSession({ refreshToken, _id: sessionId });
+  if (!oldSession) throw createHttpError(401, 'Session not found');
+
+  if (oldSession.refreshTOkenValidUntil < Date.now())
+    throw createHttpError(401, 'Session token expired');
+
+  await SessionCollection.findByIdAndDelete({ _id: oldSession._id });
+  const session = createSession();
+
+  return SessionCollection.create({
+    userId: oldSession.userId,
+    ...session,
+  });
+};
+
+export const logoutUser = (_id) => SessionCollection.findOneAndDelete({ _id });
