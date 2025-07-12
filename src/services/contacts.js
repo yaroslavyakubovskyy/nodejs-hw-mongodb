@@ -20,8 +20,16 @@ export const getContacts = async ({
   return { items, total, ...paginationData };
 };
 export const getContact = (query) => Contact.findOne(query);
-export const addContact = (payload, userId) => {
-  return Contact.create({ ...payload, userId });
+// export const addContact = (payload, userId) => {
+//   return Contact.create({ ...payload, userId });
+// };
+export const addContact = (payload, userId, photo) => {
+  const { userId: _, photo: __, ...rest } = payload;
+  return Contact.create({
+    ...rest,
+    userId,
+    photo,
+  });
 };
 export const updateContact = async (query, payload, options = {}) => {
   const result = await Contact.findOneAndUpdate(query, payload, {

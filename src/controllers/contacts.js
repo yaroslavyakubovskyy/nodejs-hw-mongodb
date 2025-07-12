@@ -10,6 +10,11 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { contactSortFields } from '../db/models/Contact.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+
+const enableCloudinary = getEnvVar('ENABLE_CLOUDINARY') === 'true';
 
 export const getContactsController = async (req, res) => {
   const { _id: userId } = req.user;
@@ -41,7 +46,16 @@ export const getContactByIdController = async (req, res) => {
 
 export const addContactController = async (req, res) => {
   const { _id: userId } = req.user;
-  const data = await addContact(req.body, userId);
+  let photo = null;
+  if (req.file) {
+    if (enableCloudinary) {
+      photo = await saveFileToCloudinary(req.file);
+    } else {
+      photo = await saveFileToUploadDir(req.file);
+    }
+  }
+  const { userId: _, photo: __, ...restBody } = req.body;
+  const data = await addContact(restBody, userId, photo);
   res
     .status(201)
     .json({ status: 201, message: 'Successfully created a contact!', data });

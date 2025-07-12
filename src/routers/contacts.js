@@ -12,6 +12,9 @@ import {
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 
 import { validateBody } from '../utils/validateBody.js';
+
+import { upload } from '../middlewares/upload.js';
+
 import {
   contactAddSchema,
   contactUpdateSchema,
@@ -29,6 +32,7 @@ contactsRouter.get('/:id', isValidID, ctrlWrapper(getContactByIdController));
 
 contactsRouter.post(
   '/',
+  upload.single('photo'),
   validateBody(contactAddSchema),
   ctrlWrapper(addContactController),
 );
