@@ -8,6 +8,8 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import authRouter from './routers/auth-router.js';
 import { getEnvVar } from './utils/getEnvVar.js';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
+import { UPLOADS_DIR } from './constants/index.js';
 export const startServer = () => {
   const app = express();
 
@@ -15,6 +17,8 @@ export const startServer = () => {
   app.use(express.json());
   app.use(express.static('uploads'));
   app.use(cookieParser());
+  app.use('/uploads', express.static(UPLOADS_DIR));
+  app.use('/api-docs', swaggerDocs());
   // app.use(
   //   pino({
   //     transport: {

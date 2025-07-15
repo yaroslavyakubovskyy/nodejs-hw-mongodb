@@ -36,7 +36,7 @@ const contactSchema = new Schema(
   { versionKey: false, timestamps: true },
 );
 contactSchema.post('save', saveErrorHandler);
-contactSchema.post('findOneAndUpdate', setUpdateSettings);
+contactSchema.pre('findOneAndUpdate', setUpdateSettings);
 contactSchema.post('findOneAndUpdate', saveErrorHandler);
 export const contactSortFields = [
   '_id',
